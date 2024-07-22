@@ -6,10 +6,14 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -17,26 +21,27 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 import java.util.List;
 
 
 
-public class CurrencyFrame extends JFrame{
+public class CurrencyFrame extends JFrame implements ActionListener{
     private JPanel toppanel;
     private JLabel toplabel;
     private JPanel midPanel;
     private JPanel convertingPanel;
     private JLabel convertingLabel;
+    private JComboBox convertingCurrencyBox;
     private JPanel convertedPanel;
     private JLabel convertedLabel;
-    private JComboBox convertingCurrencyBox;
-    private JComboBox convertedCurrencyBox;
+    private JComboBox convertedCurrecyBox;
     private CurrencyConvertApi currencyConvertApi;
     private JTextField converting_currency;
     private JTextField converted_currency;
+    private JButton submit;
+
 
 
     CurrencyFrame(){
@@ -48,7 +53,8 @@ public class CurrencyFrame extends JFrame{
 
         currencyConvertApi = new CurrencyConvertApi();
         convertingCurrencyBox = new JComboBox<>();
-        convertedCurrencyBox = new JComboBox<>();
+        convertedCurrecyBox = new JComboBox<>();
+
         new CurrencyApiThread().execute();
        
         
@@ -84,7 +90,7 @@ public class CurrencyFrame extends JFrame{
 
         convertingPanel = new JPanel();
         convertingPanel.setLayout(new FlowLayout());
-        convertingPanel.setPreferredSize(new Dimension(0,0));
+        convertingPanel.setMaximumSize(new Dimension(500,500));
         convertingPanel.setOpaque(false);
 
         convertingLabel = new JLabel("Converting Currency: ",SwingConstants.CENTER);
@@ -94,36 +100,41 @@ public class CurrencyFrame extends JFrame{
         converting_currency = new JTextField();
         converting_currency.setPreferredSize(new Dimension(70,25));
 
+        submit = new JButton("Submit");
+        submit.setFocusable(false);
+        submit.addActionListener(this);
+        submit.setFont(new Font("Calibir",Font.BOLD,12));
+
         convertingPanel.add(convertingLabel);
         convertingPanel.add(converting_currency);
         convertingPanel.add(convertingCurrencyBox);
+        convertingPanel.add(submit);
        
        
         //-----------------------------------------------------------------------------------------------
 
-        //-------------------------Sub Panel for holding the Converted Components--------------------------------
+          //-------------------------Sub Panel for holding the Converted Components--------------------------------
 
       
 
-        convertedPanel = new JPanel();
-        convertedPanel.setLayout(new FlowLayout());
-        convertedPanel.setPreferredSize(new Dimension(80,30));
-        convertedPanel.setOpaque(false);
-
-        convertedLabel = new JLabel("Converted Currency: ",SwingConstants.CENTER);
-        convertedLabel.setFont(new Font("Arial",Font.PLAIN,20));
-        convertedLabel.setForeground(Color.white);
-
-
-        converted_currency = new JTextField();
-        converted_currency.setPreferredSize(new Dimension(70,25));
-
-        convertedPanel.add(convertedLabel);
-        convertedPanel.add(converted_currency);
-        convertedPanel.add(convertedCurrencyBox);
-
-        //-------------------------------------------------------------------------------------------
-
+          convertedPanel = new JPanel();
+          convertedPanel.setLayout(new FlowLayout());
+          convertedPanel.setPreferredSize(new Dimension(80,30));
+          convertedPanel.setOpaque(false);
+  
+          convertedLabel = new JLabel("Converted Currency: ",SwingConstants.CENTER);
+          convertedLabel.setFont(new Font("Arial",Font.PLAIN,20));
+          convertedLabel.setForeground(Color.white);
+  
+  
+          converted_currency = new JTextField();
+          converted_currency.setPreferredSize(new Dimension(70,25));
+  
+          convertedPanel.add(convertedLabel);
+          convertedPanel.add(converted_currency);
+          convertedPanel.add(convertedCurrecyBox);
+  
+          //-------------------------------------------------------------------------------------------
 
         midPanel.add(convertingPanel);
         midPanel.add(convertedPanel);
@@ -152,7 +163,7 @@ public class CurrencyFrame extends JFrame{
                 List<String> currencykeys = get();
                 for(String currencykey : currencykeys){
                     convertingCurrencyBox.addItem(currencykey);
-                    convertedCurrencyBox.addItem(currencykey);
+                    convertedCurrecyBox.addItem(currencykey);
                 }
             }
             catch(Exception e){
@@ -162,6 +173,39 @@ public class CurrencyFrame extends JFrame{
 
     }
 
+
+
+
+
+
+
+
+    @Override
+    public void actionPerformed(ActionEvent ae) {
+        if(ae.getSource()==submit){
+            try {
+                ConvertingCurrencyHanlder();
+            } catch (IOException e) {
+                
+            } catch (InterruptedException e) {
+    
+            }
+        }
+    }
+
+    private void ConvertingCurrencyHanlder() throws IOException, InterruptedException{
+        try {
+                String currentcurrencyname = (String) convertingCurrencyBox.getSelectedItem();
+                double currentconvertingrate = Double.valueOf(converting_currency.getText());
+                double apicurrencyfetched =currencyConvertApi.getConversionRates(currentcurrencyname);
+
+                System.out.println(apicurrencyfetched*currentconvertingrate);
+            } 
+        catch (NumberFormatException e) {
+            System.out.println("Invalid Type!! Try Putting on Numbers.");
+            converting_currency.setText(null);
+        }
+    }
 
 
 
