@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 import java.util.List;
@@ -33,10 +34,16 @@ public class CurrencyFrame extends JFrame implements ActionListener{
     private JPanel midPanel;
     private JPanel convertingPanel;
     private JLabel convertingLabel;
+    private JLabel convertingLabel1;
+    private JLabel convertingLabel2;
     private JComboBox convertingCurrencyBox;
     private JPanel convertedPanel;
+    private JPanel leftPanel;
+    private JPanel leftPanel1;
+    private JPanel leftPanel2;
     private JLabel convertedLabel;
-    private JComboBox convertedCurrecyBox;
+    private JLabel note;
+    //private JComboBox convertedCurrecyBox;
     private CurrencyConvertApi currencyConvertApi;
     private JTextField converting_currency;
     private JTextField converted_currency;
@@ -53,7 +60,7 @@ public class CurrencyFrame extends JFrame implements ActionListener{
 
         currencyConvertApi = new CurrencyConvertApi();
         convertingCurrencyBox = new JComboBox<>();
-        convertedCurrecyBox = new JComboBox<>();
+        //convertedCurrecyBox = new JComboBox<>();
 
         new CurrencyApiThread().execute();
        
@@ -81,63 +88,98 @@ public class CurrencyFrame extends JFrame implements ActionListener{
 
         midPanel = new JPanel();
         midPanel.setBorder(new EmptyBorder(20, 0, 0, 0));
-        midPanel.setLayout(new BoxLayout(midPanel,BoxLayout.Y_AXIS));
+        midPanel.setLayout(new FlowLayout());
         midPanel.setBackground(new Color(0x202020));
         midPanel.setVisible(true);
 
         //----------------------Sub Panel for holding the Converting Components------------------------------------
        
-
+     
         convertingPanel = new JPanel();
-        convertingPanel.setLayout(new FlowLayout());
-        convertingPanel.setMaximumSize(new Dimension(500,500));
+        convertingPanel.setLayout(new BoxLayout(convertingPanel, BoxLayout.Y_AXIS));
+        convertingPanel.setPreferredSize(new Dimension(500, 500)); // Adjusted size for visibility
         convertingPanel.setOpaque(false);
 
-        convertingLabel = new JLabel("Converting Currency: ",SwingConstants.CENTER);
-        convertingLabel.setFont(new Font("Arial",Font.PLAIN,20));
+
+        leftPanel = new JPanel();
+        leftPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        leftPanel.setOpaque(false);
+
+        // Converting Label with HTML for line breaks and different font sizes
+        convertingLabel = new JLabel("<html>STEP 1:<br><span style='font-size:10px'>Enter the amount you <br>want to convert to</span></html>");
+        convertingLabel.setFont(new Font("Arial", Font.PLAIN, 20));
         convertingLabel.setForeground(Color.white);
 
-        converting_currency = new JTextField();
-        converting_currency.setPreferredSize(new Dimension(70,25));
+        note = new JLabel("<html><span style='font-size:9px'>Note:The following currency is default set to USD</span></html>");
+        note.setFont(new Font("Arial", Font.PLAIN, 8));
+        note.setForeground(Color.white);
 
+        // Text Field with a more reasonable size
+        converting_currency = new JTextField();
+        converting_currency.setPreferredSize(new Dimension(100, 25)); // Increased size for better visibility
+
+       
+        // Add components to the leftPanel
+        leftPanel.add(convertingLabel);
+        leftPanel.add(converting_currency);
+        leftPanel.add(note);
+
+
+        //second part of the conversion layer 
+        leftPanel1 = new JPanel();
+        leftPanel1.setLayout(new FlowLayout((FlowLayout.LEFT)));
+        leftPanel1.setBorder(new EmptyBorder(10,0,0,0));
+        leftPanel1.setOpaque(false);
+
+        //adding the second step for the conversion
+        convertingLabel1 = new JLabel("<html>STEP 2:<br><span style='font-size:10px'>Select the currency which <br>you want to convert to</span></html>");
+        convertingLabel1.setFont(new Font("Arial", Font.PLAIN, 20));
+        convertingLabel1.setForeground(Color.white);
+
+        // Submit Button
         submit = new JButton("Submit");
         submit.setFocusable(false);
         submit.addActionListener(this);
-        submit.setFont(new Font("Calibir",Font.BOLD,12));
+        submit.setFont(new Font("Calibri", Font.BOLD, 12));
+ 
 
-        convertingPanel.add(convertingLabel);
-        convertingPanel.add(converting_currency);
-        convertingPanel.add(convertingCurrencyBox);
-        convertingPanel.add(submit);
-       
-       
+        leftPanel1.add(convertingLabel1);
+        leftPanel1.add(convertingCurrencyBox);
+        leftPanel1.add(submit);
+
+        //second part of the conversion layer 
+        leftPanel2 = new JPanel();
+        leftPanel2.setLayout(new FlowLayout((FlowLayout.LEFT)));
+        leftPanel2.setBorder(new EmptyBorder(15,0,0,0));
+        leftPanel2.setOpaque(false);
+
+        //adding the second step for the conversion
+        convertingLabel2 = new JLabel("<html>STEP 3:<br><span style='font-size:10px'>Result:</span></html>");
+        convertingLabel2.setFont(new Font("Arial", Font.PLAIN, 20));
+        convertingLabel2.setForeground(Color.white);
+     
+
+        converted_currency = new JTextField();
+        converted_currency.setPreferredSize(new Dimension(400,20));
+        converted_currency.setEditable(false);
+        converted_currency.setOpaque(false);
+        converted_currency.setFont(new Font("Calibri",Font.BOLD,15));
+        converted_currency.setForeground(Color.CYAN);
+
+        leftPanel2.add(convertingLabel2);
+        leftPanel2.add(converted_currency);
+
+        convertingPanel.add(leftPanel);
+        convertingPanel.add(leftPanel1);
+        convertingPanel.add(leftPanel2);
+
+
+
         //-----------------------------------------------------------------------------------------------
 
-          //-------------------------Sub Panel for holding the Converted Components--------------------------------
-
-      
-
-          convertedPanel = new JPanel();
-          convertedPanel.setLayout(new FlowLayout());
-          convertedPanel.setPreferredSize(new Dimension(80,30));
-          convertedPanel.setOpaque(false);
-  
-          convertedLabel = new JLabel("Converted Currency: ",SwingConstants.CENTER);
-          convertedLabel.setFont(new Font("Arial",Font.PLAIN,20));
-          convertedLabel.setForeground(Color.white);
-  
-  
-          converted_currency = new JTextField();
-          converted_currency.setPreferredSize(new Dimension(70,25));
-  
-          convertedPanel.add(convertedLabel);
-          convertedPanel.add(converted_currency);
-          convertedPanel.add(convertedCurrecyBox);
-  
-          //-------------------------------------------------------------------------------------------
+     
 
         midPanel.add(convertingPanel);
-        midPanel.add(convertedPanel);
 
         this.add(toppanel,BorderLayout.NORTH);
         this.add(midPanel,BorderLayout.CENTER);
@@ -163,7 +205,7 @@ public class CurrencyFrame extends JFrame implements ActionListener{
                 List<String> currencykeys = get();
                 for(String currencykey : currencykeys){
                     convertingCurrencyBox.addItem(currencykey);
-                    convertedCurrecyBox.addItem(currencykey);
+                    //convertedCurrecyBox.addItem(currencykey);
                 }
             }
             catch(Exception e){
@@ -197,9 +239,9 @@ public class CurrencyFrame extends JFrame implements ActionListener{
         try {
                 String currentcurrencyname = (String) convertingCurrencyBox.getSelectedItem();
                 double currentconvertingrate = Double.valueOf(converting_currency.getText());
-                double apicurrencyfetched =currencyConvertApi.getConversionRates(currentcurrencyname);
+                float apicurrencyfetched =(float) currencyConvertApi.getConversionRates(currentcurrencyname);
 
-                System.out.println(apicurrencyfetched*currentconvertingrate);
+                converted_currency.setText(currentconvertingrate*apicurrencyfetched +" " +currentcurrencyname);
             } 
         catch (NumberFormatException e) {
             System.out.println("Invalid Type!! Try Putting on Numbers.");
